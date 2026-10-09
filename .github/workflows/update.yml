@@ -1,0 +1,44 @@
+# Updates this Worker to the latest QRCartoon release.
+#
+# Runs only when you click "Run workflow" (GitHub → Actions → Update Worker).
+# It replaces the src/ folder with the latest code from
+# github.com/Abdurrahman-Hassan/qrcartoon-redirects and commits it; Cloudflare
+# then redeploys automatically. Your settings (wrangler.jsonc, SETUP_KEY,
+# ALLOWED_HOSTS, the KV store) are never touched.
+#
+# Keep this file as it is: GitHub doesn't let workflows edit their own files,
+# so updates can't replace it.
+name: Update Worker
+
+on: workflow_dispatch
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download the latest Worker code
+        run: |
+          mkdir "$RUNNER_TEMP/upstream"
+          curl -fsSL https://github.com/Abdurrahman-Hassan/qrcartoon-redirects/archive/refs/heads/master.tar.gz \
+            | tar xz -C "$RUNNER_TEMP/upstream" --strip-components=1
+          # Never replace src/ with a broken download.
+          test -f "$RUNNER_TEMP/upstream/src/index.js"
+
+      - name: Replace src/ and commit
+        run: |
+          rm -rf src
+          cp -r "$RUNNER_TEMP/upstream/src" src
+          git add -A src
+          if git diff --cached --quiet; then
+            echo "Already up to date."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Update QRCartoon Worker"
+          git push
