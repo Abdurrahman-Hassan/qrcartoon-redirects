@@ -22,6 +22,8 @@ If the deploy screen doesn't ask for them, set them afterwards in Cloudflare: **
 
 **No Visit button, or your Worker's address won't open?** Cloudflare sometimes deploys with the `workers.dev` address switched off. Turn it on in Cloudflare: **Workers & Pages → qrcartoon-redirects → Settings → Domains & Routes → workers.dev → Enable**, wait a minute, then open the address.
 
+**First build failed with "Could not read package.json"?** Cloudflare can't read the copy of the code it made in your GitHub. On GitHub go to **Settings → Applications → Cloudflare Workers and Pages → Configure**, and under **Repository access** add `qrcartoon-redirects` (or choose All repositories). Then open **Workers & Pages → qrcartoon-redirects → Deployments** in Cloudflare and click **Retry build**.
+
 **Optional: your own domain.** In Cloudflare go to **Workers → qrcartoon-redirects → Settings → Domains & Routes** and add one, e.g. `qr.brand.com`. Your domain must use Cloudflare DNS. Then connect that address in QRCartoon (**Move to a different address**) *before* creating QR codes, because the address is printed into each QR.
 
 <!-- Updates through GitHub are switched off for now.
